@@ -1,0 +1,98 @@
+\documentclass[11pt, a4paper]{article}
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2cm, right=2cm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,microtype}
+\usepackage{hyperref}
+
+\theoremstyle{definition}
+\newtheorem{problem}{Problem}
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+
+\begin{document}
+
+\title{\vspace{-1.5cm}\textbf{Regional Quantitative Problem-Solving Circle} \\ \Large Solution Key 2: Discrete Probability \& Linearity of Expectation (Weeks 3--4)}
+\author{\textbf{Lead Architect:} Mohamed Jad Srifi}
+\date{\textbf{Term:} Fall 2025 -- Spring 2026}
+\maketitle
+
+\section*{Rigorous Proofs \& Structural Solutions}
+
+\begin{problem}[Indicator Decomposition / Circle Symmetry]
+$N$ individuals sit in a circle; each independently points left or right with probability $1/2$. Derive the expected number of unpointed individuals using indicator random variables.
+\end{problem}
+
+\begin{proof}
+Let $X$ be the random variable representing the total number of unpointed individuals. We decompose $X$ into a sum of $N$ local indicator variables. 
+For each individual $k \in \{1, \dots, N\}$, define $I_k$ such that:
+\[
+I_k = \begin{cases} 1 & \text{if individual } k \text{ is unpointed} \\ 0 & \text{otherwise} \end{cases}
+\]
+Thus, $X = \sum_{k=1}^N I_k$. To evaluate $\mathbb{E}[I_k]$, we calculate the marginal probability that individual $k$ is not pointed at. The only people capable of pointing at $k$ are their immediate left neighbor and immediate right neighbor. 
+For $k$ to be safe, the left neighbor must point left (probability $1/2$), and the right neighbor must point right (probability $1/2$). Since these two pointing actions are fully independent coin flips:
+\[
+\mathbb{E}[I_k] = \mathbb{P}(I_k = 1) = \left(\frac{1}{2}\right) \times \left(\frac{1}{2}\right) = \frac{1}{4}
+\]
+By the Linearity of Expectation, the expectation of the sum is the sum of the expectations:
+\[
+\mathbb{E}[X] = \mathbb{E}\left[\sum_{k=1}^N I_k\right] = \sum_{k=1}^N \mathbb{E}[I_k] = \sum_{k=1}^N \frac{1}{4} = \frac{N}{4}
+\]
+\textbf{Note on Independence:} The events $I_k = 1$ and $I_{k+1} = 1$ are highly dependent (if $k$ is unpointed, it influences the direction the right neighbor pointed, altering the safety of $k+1$). However, the Linearity of Expectation operator ($\mathbb{E}[A + B] = \mathbb{E}[A] + \mathbb{E}[B]$) is an absolute axiomatic property of integrals and finite sums that holds structurally regardless of any joint covariance or dependence between the variables.
+\end{proof}
+
+\vspace{0.5cm}
+
+\begin{problem}[Permutation Fixed Points \& Dependent Cycle Statistics]
+A permutation $\pi \in S_n$ is chosen uniformly at random. Let $X$ be the number of fixed points ($\pi(k) = k$) and $Y$ be the number of transpositions (cycles of length 2). Compute $\mathbb{E}[X]$ and $\mathbb{E}[Y]$.
+\end{problem}
+
+\begin{proof}
+\textbf{Part 1 (Expected Fixed Points):} Let $I_k = 1$ if $\pi(k) = k$, and $0$ otherwise. Thus $X = \sum_{k=1}^n I_k$.
+To compute $\mathbb{E}[I_k]$, we find the probability that element $k$ is fixed. If $\pi(k) = k$, the remaining $n - 1$ elements can be arranged in $(n - 1)!$ ways. Since there are $n!$ total permutations:
+\[
+\mathbb{E}[I_k] = \frac{(n - 1)!}{n!} = \frac{1}{n}
+\]
+By Linearity of Expectation: $\mathbb{E}[X] = \sum_{k=1}^n \mathbb{E}[I_k] = n \times \frac{1}{n} = 1$.
+
+\textbf{Part 2 (Expected Transpositions):} A transposition is an unordered pair $\{i, j\}$ such that $\pi(i) = j$ and $\pi(j) = i$. There are exactly $\binom{n}{2}$ such pairs. Let $J_{\{i,j\}} = 1$ if $\{i,j\}$ forms a 2-cycle, and $0$ otherwise. Thus $Y = \sum_{\{i,j\}} J_{\{i,j\}}$.
+If $\pi(i) = j$ and $\pi(j) = i$, the remaining $n - 2$ elements can be freely permuted in $(n - 2)!$ ways. The expectation of any single pair indicator is:
+\[
+\mathbb{E}[J_{\{i,j\}}] = \frac{(n - 2)!}{n!} = \frac{1}{n(n - 1)}
+\]
+By Linearity of Expectation, we sum this over all $\binom{n}{2}$ possible pairs:
+\[
+\mathbb{E}[Y] = \binom{n}{2} \times \frac{1}{n(n - 1)} = \frac{n(n - 1)}{2} \times \frac{1}{n(n - 1)} = \frac{1}{2}
+\]
+\end{proof}
+
+\vspace{0.5cm}
+
+\begin{problem}[Overcounting \& Product Space Inclusions]
+Independent integer selection from $\{1, 2, \dots, N\}$ analyzing the probability of index-power relations where neither integer is a square of the other.
+\end{problem}
+
+\begin{proof}
+We select a pair $(x, y)$ uniformly at random from the product space $\{1, 2, \dots, N\} \times \{1, 2, \dots, N\}$. The total number of possible pairs is $N^2$.
+Let $A$ be the event that $x = y^2$, and $B$ be the event that $y = x^2$. We want to find the complementary probability: $1 - \mathbb{P}(A \cup B)$.
+
+To find the cardinality $|A \cup B|$, we apply the Principle of Inclusion-Exclusion:
+\[
+|A \cup B| = |A| + |B| - |A \cap B|
+\]
+The event $A$ ($x = y^2$) occurs for every integer $y$ such that $y^2 \le N$. Since $y \ge 1$, there are exactly $\lfloor \sqrt{N} \rfloor$ such choices for $y$, which deterministically fixes $x$. Thus, $|A| = \lfloor \sqrt{N} \rfloor$. By symmetry, $|B| = \lfloor \sqrt{N} \rfloor$.
+
+The intersection event $A \cap B$ requires both $x = y^2$ and $y = x^2$. Substituting the first into the second yields $y = (y^2)^2 = y^4$.
+Because $y \in \{1, 2, \dots, N\}$, the only integer solution to $y = y^4$ is $y = 1$. This implies $x = 1^2 = 1$. Thus, the intersection contains exactly one unique pair: $(1, 1)$. Therefore, $|A \cap B| = 1$.
+
+Substituting these counts back into our Inclusion-Exclusion formula:
+\[
+|A \cup B| = \lfloor \sqrt{N} \rfloor + \lfloor \sqrt{N} \rfloor - 1 = 2\lfloor \sqrt{N} \rfloor - 1
+\]
+The number of valid pairs where neither is the square of the other is the complement: $N^2 - (2\lfloor \sqrt{N} \rfloor - 1)$. 
+Dividing by the total size of the sample space $N^2$, the exact probability is:
+\[
+\mathbb{P} = \frac{N^2 - 2\lfloor \sqrt{N} \rfloor + 1}{N^2}
+\]
+\end{proof}
+
+\end{document}
