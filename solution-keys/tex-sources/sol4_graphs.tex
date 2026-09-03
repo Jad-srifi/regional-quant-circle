@@ -1,0 +1,98 @@
+\documentclass[11pt, a4paper]{article}
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2cm, right=2cm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,microtype}
+\usepackage{hyperref}
+
+\theoremstyle{definition}
+\newtheorem{problem}{Problem}
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+
+\begin{document}
+
+\title{\vspace{-1.5cm}\textbf{Regional Quantitative Problem-Solving Circle} \\ \Large Solution Key 4: Graph Theory Foundations (Weeks 7--8)}
+\author{\textbf{Lead Architect:} Mohamed Jad Srifi}
+\date{\textbf{Term:} Fall 2025 -- Spring 2026}
+\maketitle
+
+\section*{Rigorous Proofs \& Structural Solutions}
+
+\begin{problem}[Degree-Sum \& Odd-Vertex Parity --- Tournament Structure]
+In a group of 15 quantitative researchers, is it possible for each researcher to collaborate with exactly 7 other researchers? Generalize this to prove that any graph must contain an even number of vertices of odd degree.
+\end{problem}
+
+\begin{proof}
+Let the group of researchers be the vertex set $V$ of a graph $G = (V, E)$, where $|V| = 15$. An edge exists between two vertices if they collaborate.
+If each researcher collaborates with exactly 7 others, then the degree of every vertex is $\deg(v) = 7$.
+By the Handshake Lemma, the sum of all vertex degrees must equal exactly twice the number of edges: 
+\[
+\sum_{v \in V} \deg(v) = 2|E|
+\]
+Substituting the known parameters:
+\[
+15 \times 7 = 105 = 2|E|
+\]
+Because the edge count $|E|$ must be an integer, $2|E|$ must be strictly even. However, $105$ is an odd number, yielding a strict algebraic parity contradiction. Thus, such a collaboration matrix is mathematically impossible.
+
+\textbf{Generalization:} For any graph $G = (V, E)$, we partition the vertex set $V$ into two disjoint subsets: $V_{even}$ (vertices with an even degree) and $V_{odd}$ (vertices with an odd degree).
+Applying the Handshake Lemma:
+\[
+\sum_{v \in V_{even}} \deg(v) + \sum_{v \in V_{odd}} \deg(v) = 2|E|
+\]
+Rearranging to isolate the odd vertices:
+\[
+\sum_{v \in V_{odd}} \deg(v) = 2|E| - \sum_{v \in V_{even}} \deg(v)
+\]
+The right side of the equation is the difference between two even numbers (since $2|E|$ is even, and a sum of even degrees is trivially even). Therefore, the resulting difference is strictly an even integer. 
+Because every term in the sum $\sum_{v \in V_{odd}} \deg(v)$ is an odd number, a sum of odd integers can only equal an even integer if there is an even quantity of those terms. Thus, the cardinality $|V_{odd}|$ must be even.
+\end{proof}
+
+\vspace{0.5cm}
+
+\begin{problem}[Bipartite Characterization \& Odd Cycles]
+Prove that an undirected graph $G = (V, E)$ is bipartite if and only if it contains no odd-length cycles.
+\end{problem}
+
+\begin{proof}
+We must prove both directions of the biconditional statement.
+
+\textbf{Forward Direction ($\implies$):} Assume $G = (V, E)$ is bipartite. By definition, its vertex set $V$ can be partitioned into two disjoint independent sets $V_1$ and $V_2$ such that every edge connects a vertex in $V_1$ to a vertex in $V_2$.
+Consider any arbitrary cycle $C = v_0, v_1, v_2, \dots, v_k = v_0$ in $G$.
+Without loss of generality, let $v_0 \in V_1$. Because edges strictly alternate between the two sets, $v_1 \in V_2$, $v_2 \in V_1$, $v_3 \in V_2$, and so forth.
+For any index $i$, $v_i \in V_1$ if $i$ is even, and $v_i \in V_2$ if $i$ is odd.
+Since the cycle must close and terminate back at $v_0 \in V_1$, the final index $k$ must be even. The total number of edges traversed in the cycle is $k$, which is strictly even. Thus, $G$ contains no odd-length cycles.
+
+\textbf{Reverse Direction ($\impliedby$):} Assume $G$ contains no odd-length cycles. We must construct a valid bipartite partition. Without loss of generality, assume $G$ is connected.
+Select an arbitrary starting vertex $s \in V$. We partition $V$ by extracting Breadth-First Search (BFS) distance levels. Let $L_k = \{v \in V \mid \operatorname{dist}(s, v) = k\}$.
+Define $V_1$ as the union of all levels with an even index $k$, and $V_2$ as the union of all levels with an odd index $k$.
+To prove this partition is valid, we must show no edge exists strictly within $V_1$ or strictly within $V_2$. Assume for the sake of contradiction that an edge $e = \{u, v\}$ exists within the same level $L_k$.
+By the definition of shortest paths, there exists a path from $s$ to $u$ of length $k$, and a path from $s$ to $v$ of length $k$. Let $w$ be the lowest common ancestor of $u$ and $v$ in the BFS tree, located at level $L_j$ where $j \le k$.
+The path traversing from $w$ to $u$ has length $k - j$, and the path from $w$ to $v$ has length $k - j$.
+Tracing the cycle from $w$ down to $u$, across the intra-level edge $\{u, v\}$, and back up to $w$ yields a cycle of total length:
+\[
+(k - j) + 1 + (k - j) = 2(k - j) + 1
+\]
+Because $k - j$ is an integer, $2(k - j) + 1$ is strictly an odd number. We have constructed an odd-length cycle, generating a direct contradiction with our initial assumption. Thus, no such intra-level edge $\{u, v\}$ can exist, proving $G$ is bipartite.
+\end{proof}
+
+\vspace{0.5cm}
+
+\begin{problem}[Eulerian Trail Construction \& Bridge Invariants]
+A connected graph $G$ has exactly two vertices of odd degree, $u$ and $v$, and all other vertices have even degree. Prove that $G$ admits an open Eulerian trail starting at $u$ and ending at $v$.
+\end{problem}
+
+\begin{proof}
+Let $G = (V, E)$ be a connected graph containing exactly two vertices of odd degree, $u$ and $v$. All other vertices $x \in V \setminus \{u, v\}$ possess a strictly even degree.
+We construct a modified topological graph $G'$ by adding a single "virtual edge" $e^* = \{u, v\}$ to the existing edge set $E$. Thus, $G' = (V, E \cup \{e^*\})$.
+In the new graph $G'$, the degree of $u$ is $\deg_{G'}(u) = \deg_G(u) + 1$. Because $\deg_G(u)$ was odd, adding one makes $\deg_{G'}(u)$ strictly even.
+Symmetrically, $\deg_{G'}(v) = \deg_G(v) + 1$, which is also strictly even. The degrees of all remaining vertices are unchanged and are therefore still even.
+Because every single vertex in $G'$ now possesses an even degree, and $G'$ remains fully connected, standard Eulerian transition parity dictates that $G'$ satisfies the necessary and sufficient conditions for the existence of a closed Eulerian circuit.
+Let $C$ be this Eulerian circuit in $G'$. By definition, $C$ traverses every edge in $G'$ exactly once, which means it must cross the virtual edge $e^*$ exactly once.
+Since $C$ is a continuous closed loop, we can cyclically shift our traversal starting point without breaking the circuit. Let us view the traversal of $C$ as starting exactly at vertex $v$, immediately traveling across the virtual edge $e^*$ to vertex $u$, and then continuing continuously along the remaining edges of the graph to eventually return to $v$.
+If we now strictly remove the virtual edge $e^*$ from this traversal sequence, the remaining sequence of edges forms an open, non-closing trail. 
+This trail begins exactly at $u$, traverses every actual edge of the original graph $G$ exactly once (since we only discarded $e^*$), and terminates exactly at $v$.
+Therefore, $G$ admits an open Eulerian trail linking its two odd-degree vertices.
+\end{proof}
+
+\end{document}
