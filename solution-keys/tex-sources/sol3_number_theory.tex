@@ -1,0 +1,117 @@
+\documentclass[11pt, a4paper]{article}
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2cm, right=2cm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,microtype}
+\usepackage{hyperref}
+
+\theoremstyle{definition}
+\newtheorem{problem}{Problem}
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+
+\begin{document}
+
+\title{\vspace{-1.5cm}\textbf{Regional Quantitative Problem-Solving Circle} \\ \Large Solution Key 3: Number Theory \& Modular Congruence (Weeks 5--6)}
+\author{\textbf{Lead Architect:} Mohamed Jad Srifi}
+\date{\textbf{Term:} Fall 2025 -- Spring 2026}
+\maketitle
+
+\section*{Rigorous Proofs \& Structural Solutions}
+
+\begin{problem}[Polynomial Divisibility \& Euclidean Reduction --- AIME Caliber]
+Find all positive integers $n$ such that $(2n + 1) \mid (n^3 + 3n^2 + 7)$.
+\end{problem}
+
+\begin{proof}
+Let $A = 2n + 1$ and $B = n^3 + 3n^2 + 7$. We are given the condition $A \mid B$.
+The fundamental invariant of Euclidean divisibility states that if $A \mid B$, then $A$ must also divide any linear combination involving $B$, such as $A \mid 8B$. 
+Multiplying the target polynomial by $8$ allows us to cleanly execute polynomial long division without introducing fractional coefficients:
+\[
+8B = 8n^3 + 24n^2 + 56
+\]
+We divide $8n^3 + 24n^2 + 56$ by $2n + 1$ to isolate a constant remainder:
+\[
+8n^3 + 24n^2 + 56 = (2n + 1)(4n^2 + 10n - 5) + 61
+\]
+Because $(2n + 1)$ trivially divides the component $(2n + 1)(4n^2 + 10n - 5)$, the structural invariant of divisibility dictates that it must also divide the isolated remainder:
+\[
+(2n + 1) \mid 61
+\]
+Since $61$ is a prime number, its only integer divisors are $-61, -1, 1, 61$. We test each divisor boundary:
+\begin{itemize}
+    \item $2n + 1 = 1 \implies 2n = 0 \implies n = 0$ (Not a positive integer).
+    \item $2n + 1 = -1 \implies 2n = -2 \implies n = -1$ (Not a positive integer).
+    \item $2n + 1 = -61 \implies 2n = -62 \implies n = -31$ (Not a positive integer).
+    \item $2n + 1 = 61 \implies 2n = 60 \implies n = 30$.
+\end{itemize}
+Thus, the only positive integer solution is $n = 30$. 
+\end{proof}
+
+\vspace{0.5cm}
+
+\begin{problem}[Order, Invariants \& Fermat's Little Theorem --- Olympiad Track]
+Let $p$ be an odd prime. Prove that any prime divisor $q$ of the Mersenne number $2^p - 1$ must satisfy the congruence $q \equiv 1 \pmod{2p}$.
+\end{problem}
+
+\begin{proof}
+Since $q$ is a prime divisor of $2^p - 1$, we can express this relation using modular congruence:
+\[
+2^p - 1 \equiv 0 \pmod{q} \implies 2^p \equiv 1 \pmod{q}
+\]
+This congruence implies that the multiplicative order of $2$ modulo $q$, denoted $\operatorname{ord}_q(2)$, must divide the exponent $p$.
+Because $p$ is prime, its only positive divisors are $1$ and $p$.
+If $\operatorname{ord}_q(2) = 1$, this would mean $2^1 \equiv 1 \pmod{q}$, implying $q \mid 1$, which is impossible for a prime $q$.
+Therefore, the multiplicative order is strictly determined: $\operatorname{ord}_q(2) = p$.
+
+By Fermat's Little Theorem, since $q$ is an odd prime (as it divides an odd number) and $\gcd(2, q) = 1$, we know that:
+\[
+2^{q - 1} \equiv 1 \pmod{q}
+\]
+A fundamental property of multiplicative orders is that if $2^k \equiv 1 \pmod{q}$, then $\operatorname{ord}_q(2) \mid k$. 
+Substituting our known order, we deduce:
+\[
+p \mid (q - 1)
+\]
+This means there exists an integer $k$ such that $q - 1 = kp$.
+Now we invoke parity. The number $2^p - 1$ is strictly odd. Any prime divisor $q$ of an odd number must also be odd. Consequently, the term $q - 1$ must be an even integer. 
+Since $p$ is an odd prime, for the product $kp$ to be even, the integer multiplier $k$ must be even. Let $k = 2m$.
+Substituting this back into the equality yields:
+\[
+q - 1 = (2m)p = m(2p)
+\]
+This factorization proves that $2p \mid (q - 1)$, which is definitionally equivalent to the congruence:
+\[
+q \equiv 1 \pmod{2p}
+\]
+\end{proof}
+
+\vspace{0.5cm}
+
+\begin{problem}[Diophantine Integral Invariant --- MathMaroc / Putnam Style]
+Determine all pairs of positive integers $(x, y)$ satisfying the equation $x^2 - 3y^2 = 17$.
+\end{problem}
+
+\begin{proof}
+Assume, for the sake of contradiction, that there exists at least one pair of positive integers $(x, y)$ satisfying the equation.
+We analyze the Diophantine equation by projecting it into the modular ring $\mathbb{Z}/3\mathbb{Z}$ (modulo $3$).
+Taking the entire equation modulo $3$, the term $-3y^2$ is perfectly divisible by $3$ and evaluates to $0$:
+\[
+x^2 - 0 \equiv 17 \pmod{3}
+\]
+Reducing the constant $17$ modulo $3$, we find $17 = 3 \times 5 + 2$, so $17 \equiv 2 \pmod{3}$.
+This leaves us with the constrained congruence:
+\[
+x^2 \equiv 2 \pmod{3}
+\]
+We now evaluate the exhaustive set of quadratic residues modulo $3$. Any integer $x$ must be congruent to $0, 1,$ or $2$ modulo $3$. Squaring these base residue classes:
+\begin{itemize}
+    \item If $x \equiv 0 \pmod{3}$, then $x^2 \equiv 0 \pmod{3}$.
+    \item If $x \equiv 1 \pmod{3}$, then $x^2 \equiv 1 \pmod{3}$.
+    \item If $x \equiv 2 \pmod{3}$, then $x^2 \equiv 4 \equiv 1 \pmod{3}$.
+\end{itemize}
+The only valid quadratic residues modulo $3$ are $0$ and $1$. The value $2$ is a strict quadratic non-residue. 
+Because no integer $x$ can satisfy $x^2 \equiv 2 \pmod{3}$, the modular constraint contradicts the original assumption.
+Thus, the equation $x^2 - 3y^2 = 17$ admits strictly no integer solutions.
+\end{proof}
+
+\end{document}
