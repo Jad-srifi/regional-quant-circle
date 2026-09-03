@@ -1,0 +1,140 @@
+\documentclass[11pt, a4paper]{article}
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2cm, right=2cm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,microtype}
+\usepackage{hyperref}
+
+\theoremstyle{definition}
+\newtheorem{problem}{Problem}
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+
+\begin{document}
+
+\title{\vspace{-1.5cm}\textbf{Regional Quantitative Problem-Solving Circle} \\ \Large Solution Key 6: Stochastic Modeling, Markov Chains \& Synthesis (Weeks 11--12)}
+\author{\textbf{Lead Architect:} Mohamed Jad Srifi}
+\date{\textbf{Term:} Fall 2025 -- Spring 2026}
+\maketitle
+
+\section*{Rigorous Proofs \& Structural Solutions}
+
+\begin{problem}[Gambler's Ruin / First-Step Difference Equations --- Putnam Caliber]
+Derive the boundary value recurrence for ruin probability $R_k$, analyze telescoping differences $(R_{k+1} - R_k)$, and derive exact closed-form expressions for $p = 1/2$ and $p \ne 1/2$.
+\end{problem}
+
+\begin{proof}
+Let $R_k$ be the probability of ruin starting from state $k$. By First-Step Analysis, the process transitions to state $k+1$ with probability $p$ and to state $k-1$ with probability $q$. The recurrence is:
+\[
+R_k = p R_{k+1} + q R_{k-1}
+\]
+The absorbing boundary conditions are $R_0 = 1$ (immediate ruin) and $R_N = 0$ (immediate victory).
+Because $p + q = 1$, we can rewrite the left side as $(p + q)R_k$:
+\begin{align*}
+p R_k + q R_k &= p R_{k+1} + q R_{k-1} \\
+p(R_{k+1} - R_k) &= q(R_k - R_{k-1}) \\
+R_{k+1} - R_k &= \frac{q}{p} (R_k - R_{k-1})
+\end{align*}
+Define the first-order difference $\Delta_k = R_{k+1} - R_k$. The relation establishes a geometric progression: $\Delta_k = (\frac{q}{p}) \Delta_{k-1}$.
+By recursive substitution down to the base difference $\Delta_0 = R_1 - R_0$:
+\[
+\Delta_i = \left(\frac{q}{p}\right)^i (R_1 - R_0)
+\]
+We isolate $R_k$ by summing the telescoping differences from index $0$ to $k-1$:
+\begin{align*}
+\sum_{i=0}^{k-1} (R_{i+1} - R_i) &= R_k - R_0 \\
+R_k - 1 &= \sum_{i=0}^{k-1} \left(\frac{q}{p}\right)^i (R_1 - 1)
+\end{align*}
+\textbf{Case 1 ($p = 1/2 \implies q/p = 1$):} 
+The summation reduces to summing the constant $1$ exactly $k$ times.
+\[
+R_k - 1 = k(R_1 - 1)
+\]
+We apply the upper boundary $R_N = 0$ to solve for $R_1$: $0 - 1 = N(R_1 - 1) \implies (R_1 - 1) = -1/N$.
+Substituting back: $R_k = 1 - \frac{k}{N}$.
+
+\textbf{Case 2 ($p \ne 1/2 \implies q/p \ne 1$):}
+The summation is a standard finite geometric series:
+\[
+R_k - 1 = (R_1 - 1) \frac{1 - (q/p)^k}{1 - (q/p)}
+\]
+We apply the upper boundary $R_N = 0$ to isolate $(R_1 - 1)$:
+\[
+-1 = (R_1 - 1) \frac{1 - (q/p)^N}{1 - (q/p)} \implies (R_1 - 1) = - \frac{1 - (q/p)}{1 - (q/p)^N}
+\]
+Substituting back into the $R_k$ equation yields the closed-form ruin probability:
+\[
+R_k = 1 - \frac{1 - (q/p)^k}{1 - (q/p)^N} = \frac{(q/p)^k - (q/p)^N}{1 - (q/p)^N}
+\]
+\end{proof}
+
+\vspace{0.5cm}
+
+\begin{problem}[Expected Hitting Times on Symmetric Cyclic Graphs --- MIT 6.042 Standard]
+Derive the recurrence $E_k = 1 + 0.5 E_{k-1} + 0.5 E_{k+1}$, evaluate $\Delta^2 E_k = -2$, and prove $E_k = k(N - k)$.
+\end{problem}
+
+\begin{proof}
+Let $E_k$ be the expected time to reach the absorbing node $0$ starting from node $k$. By First-Step Analysis, taking one step consumes $1$ time unit, after which the particle transitions to $k-1$ or $k+1$ with equal probability $1/2$. Thus:
+\[
+E_k = 1 + \frac{1}{2}E_{k-1} + \frac{1}{2}E_{k+1} \quad \text{for } 1 \le k \le N-1
+\]
+The boundary conditions are $E_0 = 0$ and $E_N = 0$ (since node $N$ is topologically identical to node $0$ on the cycle).
+We rearrange the recurrence to isolate the discrete differences. Multiply by $2$:
+\begin{align*}
+2E_k &= 2 + E_{k-1} + E_{k+1} \\
+E_k - E_{k-1} - (E_{k+1} - E_k) &= 2
+\end{align*}
+Define the first-order forward difference $\Delta E_k = E_{k+1} - E_k$. Substituting this yields:
+\begin{align*}
+- (\Delta E_k - \Delta E_{k-1}) &= 2 \\
+\Delta^2 E_k &= -2
+\end{align*}
+The second-order finite difference is a strictly negative constant ($-2$). In discrete calculus, a constant second difference implies the solution sequence $E_k$ must be a purely quadratic polynomial of the form:
+\[
+E_k = Ak^2 + Bk + C
+\]
+We apply our boundary conditions to solve for the coefficients. 
+From $E_0 = 0$, we immediately derive $C = 0$.
+To satisfy $\Delta^2 E_k = -2$, the leading coefficient of the quadratic must be half of the second difference (analogous to the continuous second derivative). Thus, $A = -2 / 2 = -1$. The equation simplifies to $E_k = -k^2 + Bk$.
+From the topological wrap-around boundary $E_N = 0$:
+\[
+-N^2 + BN = 0 \implies B = N
+\]
+Substituting $B$ into our polynomial provides the exact expected hitting time:
+\[
+E_k = -k^2 + Nk = k(N - k)
+\]
+\end{proof}
+
+\vspace{0.5cm}
+
+\begin{problem}[Synthesis: Coupling \& Stationary Distribution Convergence]
+Formulate the dual-particle system as a single absorbing Markov chain and derive the exact expected meeting time.
+\end{problem}
+
+\begin{proof}
+The total state space of the two particles is strictly vast, but due to the complete symmetry of the complete graph $K_M$, we can collapse the state space into a binary Markov chain based strictly on spatial intersection. Let the states be $S_0$ (particles occupy distinct vertices) and $S_1$ (particles occupy the same vertex). State $S_1$ is absorbing.
+We must calculate $p$, the probability of transitioning from $S_0$ to $S_1$ in a single discrete step. Let the particles originate at vertices $A$ and $B$. There are exactly three mutually exclusive pathways for a collision to occur:
+\begin{enumerate}
+    \item Particle A stays at $A$, and Particle B moves to $A$. The joint probability is:
+    \[ \frac{1}{2} \times \frac{1}{2(M-1)} = \frac{1}{4(M-1)} \]
+    \item Particle B stays at $B$, and Particle A moves to $B$. Symmetrically, the probability is:
+    \[ \frac{1}{2(M-1)} \times \frac{1}{2} = \frac{1}{4(M-1)} \]
+    \item Both Particle A and Particle B move simultaneously to a third, identical vertex $v \notin \{A, B\}$. There are exactly $(M - 2)$ such available vertices. The joint probability is:
+    \[ (M - 2) \times \left( \frac{1}{2(M-1)} \right) \times \left( \frac{1}{2(M-1)} \right) = \frac{M-2}{4(M-1)^2} \]
+\end{enumerate}
+Since these pathways are mutually exclusive, we sum them to find the total transition probability $p$:
+\begin{align*}
+p &= \frac{1}{4(M-1)} + \frac{1}{4(M-1)} + \frac{M-2}{4(M-1)^2} \\
+p &= \frac{(M-1) + (M-1) + (M-2)}{4(M-1)^2} \\
+p &= \frac{3M - 4}{4(M-1)^2}
+\end{align*}
+Because the system is memoryless and the collision probability $p$ is strictly constant at every step in $S_0$, the number of steps $T$ required to hit the absorbing state $S_1$ perfectly follows a geometric distribution.
+The expected value of a geometric random variable is the reciprocal of its success probability:
+\[
+\mathbb{E}[T] = \frac{1}{p} = \frac{4(M-1)^2}{3M - 4}
+\]
+Thus, the expected time for the independent random walks to intersect is strictly bounded.
+\end{proof}
+
+\end{document}
