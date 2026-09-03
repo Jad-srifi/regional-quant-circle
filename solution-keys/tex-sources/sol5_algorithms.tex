@@ -1,0 +1,105 @@
+\documentclass[11pt, a4paper]{article}
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2cm, right=2cm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,microtype}
+\usepackage{hyperref}
+
+\theoremstyle{definition}
+\newtheorem{problem}{Problem}
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+
+\begin{document}
+
+\title{\vspace{-1.5cm}\textbf{Regional Quantitative Problem-Solving Circle} \\ \Large Solution Key 5: Algorithmic Invariants \& Exchange Arguments (Weeks 9--10)}
+\author{\textbf{Lead Architect:} Mohamed Jad Srifi}
+\date{\textbf{Term:} Fall 2025 -- Spring 2026}
+\maketitle
+
+\section*{Rigorous Proofs \& Structural Solutions}
+
+\begin{problem}[Interval Scheduling / Adjacent Exchange --- IOI / Kleinberg-Tardos Caliber]
+Prove that the greedy choice of selecting the compatible interval with the earliest finish time ($f_i$) maximizes total scheduled requests.
+\end{problem}
+
+\begin{proof}
+Let $G = \{g_1, g_2, \dots, g_k\}$ be the set of disjoint intervals selected by the greedy earliest-finish-time algorithm, ordered strictly by finish time such that $f(g_1) \le f(g_2) \le \dots \le f(g_k)$.
+Let $O = \{o_1, o_2, \dots, o_m\}$ be a hypothetical optimal solution of disjoint intervals, also ordered by finish time such that $f(o_1) \le f(o_2) \le \dots \le f(o_m)$. By definition of optimality, $m \ge k$.
+
+We will prove by mathematical induction that for all integer indices $r \le k$, the greedy interval finishes no later than the optimal interval: $f(g_r) \le f(o_r)$.
+
+\textbf{Base Case ($r = 1$):} The greedy algorithm explicitly selects the interval in the entire global set with the absolute minimum finish time. Thus, the finish time of $g_1$ must be less than or equal to the finish time of any interval in $O$, including $o_1$. Therefore, $f(g_1) \le f(o_1)$.
+
+\textbf{Inductive Step:} Assume that $f(g_r) \le f(o_r)$ holds for some integer $r < k$. We must show that $f(g_{r+1}) \le f(o_{r+1})$. 
+By the definition of a valid schedule, the interval $o_{r+1}$ must start strictly after $o_r$ finishes, yielding $s(o_{r+1}) \ge f(o_r)$. 
+Using our inductive hypothesis $f(g_r) \le f(o_r)$, we have $s(o_{r+1}) \ge f(g_r)$. This inequality mathematically proves that $o_{r+1}$ is fully compatible with the greedy interval $g_r$. 
+When the greedy algorithm selected $g_{r+1}$, it evaluated all intervals compatible with $g_r$ and chose the one minimizing the finish time. Because $o_{r+1}$ was available and compatible, the greedy choice $g_{r+1}$ must finish no later than $o_{r+1}$. Thus, $f(g_{r+1}) \le f(o_{r+1})$.
+
+\textbf{Conclusion via Contradiction:} We have established that $f(g_k) \le f(o_k)$. Now, assume for the sake of contradiction that the optimal schedule is strictly larger than the greedy schedule, meaning $m > k$. This implies there exists at least one additional interval $o_{k+1} \in O$.
+For $O$ to be valid, $o_{k+1}$ must start after $o_k$ finishes: $s(o_{k+1}) \ge f(o_k)$.
+Since $f(g_k) \le f(o_k)$, it strictly follows that $s(o_{k+1}) \ge f(g_k)$. 
+This proves $o_{k+1}$ is compatible with $g_k$. However, the greedy algorithm only terminates when strictly zero compatible intervals remain. If $o_{k+1}$ existed and was compatible, the greedy algorithm would have selected it, meaning $|G| > k$, which contradicts our definition of $G$. Since assuming $m > k$ yields a contradiction, and $m \ge k$ by definition of optimality, we must have $m = k$. The greedy algorithm is optimal.
+\end{proof}
+
+\vspace{0.5cm}
+
+\begin{problem}[Minimizing Maximum Lateness / Inversion Invariant --- Algorithmic Tripos]
+Prove that any schedule with an inversion can be swapped without increasing the maximum lateness $L = \max_i (C_i - d_i)$, proving EDF is globally optimal.
+\end{problem}
+
+\begin{proof}
+Consider an optimal schedule $O$ that does not follow the Earliest Deadline First (EDF) order. Therefore, $O$ must contain at least one inversion: an adjacent pair of jobs where job $i$ is scheduled immediately before job $j$, but their deadlines violate the EDF rule, meaning $d_i > d_j$.
+Let the processing times be $t_i$ and $t_j$. Let $S$ be the start time of job $i$ in this schedule. 
+Before the swap, the completion times and lateness are evaluated as:
+\begin{align*}
+C_i &= S + t_i \\
+C_j &= S + t_i + t_j \\
+L_i &= C_i - d_i = S + t_i - d_i \\
+L_j &= C_j - d_j = S + t_i + t_j - d_j
+\end{align*}
+The maximum lateness localized to this pair is $\max(L_i, L_j)$.
+Now, apply an exchange perturbation, creating a new schedule $O'$ by swapping job $i$ and job $j$. Job $j$ now processes first. The new completion times and lateness are:
+\begin{align*}
+C'_j &= S + t_j \\
+C'_i &= S + t_j + t_i = C_j \\
+L'_j &= C'_j - d_j = S + t_j - d_j \\
+L'_i &= C'_i - d_i = S + t_i + t_j - d_i
+\end{align*}
+We must prove that the maximum lateness of the swapped pair does not exceed the original maximum lateness: $\max(L'_i, L'_j) \le \max(L_i, L_j)$.
+First, observe $L'_i$. Since $C'_i = C_j$ and $d_i > d_j$ (the inversion condition), we have:
+\[
+L'_i = C'_i - d_i = C_j - d_i < C_j - d_j = L_j
+\]
+Second, observe $L'_j$. Because $t_i > 0$, we know $S + t_j < S + t_i + t_j$, giving:
+\[
+L'_j = S + t_j - d_j < S + t_i + t_j - d_j = L_j
+\]
+Because both $L'_i < L_j$ and $L'_j < L_j$, it is strictly guaranteed that $\max(L'_i, L'_j) \le L_j \le \max(L_i, L_j)$.
+Since the completion times of all jobs preceding the pair and all jobs succeeding the pair remain strictly unchanged (as $t_i + t_j = t_j + t_i$), the global maximum lateness $L'$ of the new schedule satisfies $L' \le L$.
+By iteratively eliminating all adjacent inversions via swaps, we monotonically transform any schedule into the EDF schedule without ever increasing the maximum lateness. Thus, EDF is optimal.
+\end{proof}
+
+\vspace{0.5cm}
+
+\begin{problem}[Chip-Firing / Monovariant Termination --- Olympiad Caliber]
+Define $\Phi = \sum_{v=1}^M v^2 \cdot c(v)$. Prove that $\Phi$ is a strict monovariant and that the game terminates.
+\end{problem}
+
+\begin{proof}
+Let the total potential of the system at any given discrete state be $\Phi = \sum_{v=1}^M v^2 \cdot c(v)$.
+We evaluate the change in potential, $\Delta \Phi$, after a single legal firing move occurs at an arbitrary internal vertex $k$. 
+By the rules of the game, a legal firing removes exactly $2$ chips from vertex $k$, adds exactly $1$ chip to vertex $k - 1$, and adds exactly $1$ chip to vertex $k + 1$. The chip counts at all other vertices remain strictly invariant.
+The change in the state potential is algebraically isolated to these three vertices:
+\begin{align*}
+\Delta \Phi &= \Phi_{\text{new}} - \Phi_{\text{old}} \\
+&= \Big( (k - 1)^2 (1) + (k + 1)^2 (1) - k^2 (2) \Big) \\
+&= \Big( (k^2 - 2k + 1) + (k^2 + 2k + 1) - 2k^2 \Big) \\
+&= \Big( 2k^2 + 2 - 2k^2 \Big) \\
+&= 2
+\end{align*}
+This yields a profound structural invariant: every single legal move strictly increases the global potential function by exactly $2$, meaning $\Delta \Phi = 2 > 0$. Therefore, $\Phi$ is a strictly increasing monovariant.
+Because the total number of chips $N$ is strictly conserved and the graph is a finite domain bounded by the maximum vertex label $M$, the absolute maximum possible potential occurs if all $N$ chips were stacked on the highest indexed vertex $M$. Thus, $\Phi \le N \cdot M^2$.
+Because $\Phi$ is an integer sequence strictly increasing by $2$ at every step, and is bounded by a finite mathematical ceiling, the sequence of states must terminate by the Extremal Principle. The game ends in a finite number of steps.
+\end{proof}
+
+\end{document}
