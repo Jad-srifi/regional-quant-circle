@@ -1,0 +1,45 @@
+\documentclass[11pt, a4paper]{article}
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2cm, right=2cm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,microtype}
+\usepackage{hyperref}
+
+\theoremstyle{definition}
+\newtheorem{problem}{Problem}
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+
+\begin{document}
+
+\title{\vspace{-1.5cm}\textbf{Regional Quantitative Problem-Solving Circle} \\ \Large Problem Set 4: Graph Theory Foundations (Weeks 7--8)}
+\author{\textbf{Lead Architect:} Mohamed Jad Srifi}
+\date{\textbf{Term:} Fall 2025 -- Spring 2026}
+\maketitle
+
+\noindent\textbf{Instructions:} Visual graph drawings are insufficient for formal proofs. You must rely on absolute topological invariants, including degree sums, parity, shortest-path bounds, and edge traversals. 
+
+\vspace{0.5cm}
+
+\begin{problem}[Degree-Sum \& Odd-Vertex Parity --- Tournament Structure]
+In a group of 15 quantitative researchers, is it possible for each researcher to collaborate with exactly 7 other researchers? 
+
+Generalize this contradiction using the Handshake Lemma ($\sum_{v \in V} \deg(v) = 2|E|$) to rigorously prove that any finite undirected graph must contain an even number of vertices of odd degree.
+\end{problem}
+
+\vspace{0.5cm}
+
+\begin{problem}[Bipartite Characterization \& Odd Cycles]
+Prove that an undirected graph $G = (V, E)$ is bipartite (i.e., its vertex set can be partitioned into two independent sets $V_1, V_2$) if and only if it contains no odd-length cycles.
+
+\textit{(Hint: You must prove both directions. For the reverse direction, assume the graph is connected and construct the sets $V_1, V_2$ based on Breadth-First Search shortest-path distances $L_k = \{v \in V \mid \operatorname{dist}(s, v) = k\}$.)}
+\end{problem}
+
+\vspace{0.5cm}
+
+\begin{problem}[Eulerian Trail Construction \& Bridge Invariants]
+A connected undirected graph $G$ has exactly two vertices of odd degree, $u$ and $v$, and all other vertices have an even degree. Prove that $G$ admits an open Eulerian trail starting at $u$ and ending at $v$.
+
+\textit{(Hint: Formalize your proof by adding a temporary "virtual edge" $\{u, v\}$ to create a known topological state, constructing a cycle, and then severing the virtual edge.)}
+\end{problem}
+
+\end{document}
